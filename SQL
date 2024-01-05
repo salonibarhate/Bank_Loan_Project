@@ -1,134 +1,146 @@
 BANK LOAN PROJECT QUERY DOC
-BANK LOAN REPORT: SUMMARY
-KPI’s
-Total loan applications
-Calculate the total number of loan applications received during a specific period. Customer ID is a unique identifying factor; the customer ID count = the number of loan applications
+
+-- KPI’s
+
+-- Total loan applications
+
 SELECT COUNT(id) AS total_loan_applications
 FROM financial_loan_data
  
-Purpose: Loan ID is a unique identifier assigned to each loan application or loan account. It serves as a primary key for tracking and managing individual loans. Use for Banks: Banks use Loan IDs to efficiently manage and track loans throughout their lifecycle. It aids in organizing loan records, monitoring repayments, and addressing customer inquiries.
-PMTD loan applications
-Monitor the month to date (MTD) loan applications to track the MoM (month-over-month) changes. Previous MTD (PMTD) applications tells us how man applications were received during the previous month (November).
+-- PMTD loan applications
+
 SELECT COUNT(id) AS total_applications 
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 11
  
 ------
-Total funded amount	
-Understand the total amount of funds disbursed as loans. Monitor the MTD total funded amount and analyze the MoM changes.
+-- Total funded amount	
+
 SELECT SUM(loan_amount) AS total_funded_amount
 FROM financial_loan_data
 
- 
-MTD funded amount
-Analyze month-to-date (MTD) total amount received and observe the MoM changes using PMTD.
+-- MTD funded amount
 
 SELECT SUM(loan_amount) AS total_funded_amount
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 12
  
-PMTD funded amount
+-- PMTD funded amount
+
 SELECT SUM(loan_amount) AS previous_total_funded_amount
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 11
  
-Total amount received
-Track the total amount received from the borrowers (assess the bank’s cash flow and loan repayment). Analyze month-to-date (MTD) total amount received and observe the MoM changes.
+-- Total amount received
+
 SELECT SUM(total_payment) AS total_amount_received
 FROM financial_loan_data
  
-MTD amount received
+-- MTD amount received
+
 SELECT SUM(total_payment) AS MTD_total_amount_received
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 12
  
-PMTD amount received
+-- PMTD amount received
+
 SELECT SUM(total_payment) AS PMTD_total_amount_received
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 11
 
- 
 ------
-Average interest rate across loans
-Calculate average interest rates cross all loans, MTD, and MoM variations in interest rates (provides insights into overall cost of lending portfolio).
+-- Average interest rate across loans
+
 SELECT ROUND(AVG(int_rate), 4) * 100 AS avg_interest_rate
 FROM financial_loan_data
  
-Purpose: Interest Rate represents the annual cost of borrowing expressed as a percentage. It determines the loan's cost. Use for Banks: Banks use interest rates to price loans, manage profit margins, and attract investors.
-MTD average interest rate
+-- MTD average interest rate
+
 SELECT ROUND(AVG(int_rate), 4) * 100 AS MTD_avg_interest_rate
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 12 AND YEAR(issue_date) = 2021
  
-PMTD average interest rate
+-- PMTD average interest rate
+
 SELECT ROUND(AVG(int_rate), 4) * 100 AS PMTD_avg_interest_rate
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 11 AND YEAR(issue_date) = 2021
  
-Average DTI across loans
-Evaluate the average DTI for borrowers to gauge their financial health. Calculate average DTI for all loans, MTD, and track MoM fluctuations.
+-- Average DTI across loans
+
 SELECT ROUND(AVG(dti), 4) * 100 AS avg_DTI
 FROM financial_loan_data
  
-Purpose: DTI measures the borrower's debt burden relative to income. It gauges the borrower's capacity to take on additional debt. Use for Banks: Banks use DTI to assess a borrower's ability to handle loan payments and make responsible lending decisions.
-MTD average DTI across loans
+-- MTD average DTI across loans
+
 SELECT ROUND(AVG(dti), 4) * 100 AS MTD_avg_DTI
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 12 AND YEAR(issue_date) = 2021
  
-PMTD average DTI across loans
+-- PMTD average DTI across 
+
 SELECT ROUND(AVG(dti), 4) * 100 AS PMTD_avg_DTI
 FROM financial_loan_data
 WHERE MONTH(issue_date) = 11 AND YEAR(issue_date) = 2021
  
-GOOD LOANS ISSUED - refers to loans that are current and fully paid.
-Percentage of good loans issued
+-- GOOD LOANS ISSUED 
+
+-- Percentage of good loans issued
+
 SELECT
 	(COUNT(CASE WHEN loan_status = 'Fully Paid' OR loan_status = 'Current' THEN id END) * 100) 
 	/
 	COUNT(id) AS good_loan_percentage
 FROM financial_loan_data
  
-Percentage of good loan applications
+-- Percentage of good loan applications
+
 SELECT COUNT(id) AS good_loan_applications
 FROM financial_loan_data
 WHERE loan_status = 'Fully Paid' OR loan_status = 'Current'
  
-Good loan funded amount
+-- Good loan funded 
+
 SELECT SUM(loan_amount) AS good_loan_funded_amount
 FROM financial_loan_data
 WHERE loan_status = 'Fully Paid' OR loan_status = 'Current'
  
-Total good loan amount received
+-- Total good loan amount 
+
 SELECT SUM(total_payment) AS good_loan_amount_received
 FROM financial_loan_data
 WHERE loan_status = 'Fully Paid' OR loan_status = 'Current'
  
-Percentage of bad loans issued
+-- Percentage of bad loans 
+
 SELECT
 	(COUNT(CASE WHEN loan_status = 'Charged Off' THEN id END) * 100) 
 	/
 	COUNT(id) AS good_loan_percentage
 FROM financial_loan_data
  
-BAD LOANS ISSUED - refers to loans that have been charged off.
-Percentage of bad loan applications
+-- BAD LOANS ISSUED 
+
+-- Percentage of bad loan applications
+
 SELECT COUNT(id) AS bad_loan_applications
 FROM financial_loan_data
 WHERE loan_status = ‘Charged Off’
  
-Bad loan funded amount
+-- Bad loan funded 
+
 SELECT SUM(loan_amount) AS bad_loan_funded_amount
 FROM financial_loan_data
 WHERE loan_status = ‘Charged Off’
  
-Total bad loan amount received
+-- Total bad loan amount received
+
 SELECT SUM(total_payment) AS bad_loan_amount_received
 FROM financial_loan_data
 WHERE loan_status = ‘Charged Off’
  
-LOAN STATUS
-Loan status
+-- LOAN STATUS
+
 SELECT
     loan_status,
     COUNT(id) AS loan_count,
@@ -139,14 +151,9 @@ SELECT
 FROM financial_loan_data
 GROUP BY loan_status
 
- 
-Loan status grid view
-
-Function: gain a comprehensive overview of lending operations and monitor the performance of loans by creating a grid view repot categorized by ‘loan status’. Metrics such as total loan applications, total funded amount, total amount received, MTD funded amount, MTD amount received, average interest rate, and average DTI ratio provide insight into the health of the loan portfolio and empowers us to make data-driven decisions
-
 BANK LOAN REPORT: OVERVIEW
 
-Month 
+-- Month 
 
 SELECT 
 	MONTH(issue_date) AS month_number,
@@ -158,7 +165,7 @@ FROM financial_loan_data
 GROUP BY MONTH(issue_date), DATENAME(MONTH, issue_date)
 ORDER BY MONTH(issue_date)
  
-State
+-- State
 
 SELECT 
 	address_state,
@@ -169,9 +176,7 @@ FROM financial_loan_data
 GROUP BY address_state
 ORDER BY address_state
  
- 
-Purpose: Address State indicates the borrower's location. It helps in assessing regional risk factors, compliance with state regulations, and estimating default probabilities. Use for Banks: Banks use this information to identify regional trends in loan demand, adjust marketing strategies, and manage risk portfolios based on geographic regions.
-Term
+-- Term
 
 SELECT 
 	term,
@@ -182,8 +187,7 @@ FROM financial_loan_data
 GROUP BY term
 ORDER BY term
  
-Purpose: Term defines the duration of the loan in months. It sets the repayment period. Use for Banks: Banks use the term to structure loan agreements, calculate interest payments, and manage loan maturities.
-Employee Length
+-- Employee Length
 
 SELECT 
 	emp_length,
@@ -194,8 +198,7 @@ FROM financial_loan_data
 GROUP BY emp_length
 ORDER BY emp_length
  
-Purpose: Employee Length provides insights into the borrower's employment stability. Longer employment durations may indicate greater job security. Use for Banks: Banks consider employment length when assessing a borrower's ability to repay. Stable employment often translates to a lower default risk.
-Purpose
+-- Purpose
 
 SELECT 
 	purpose,
@@ -217,5 +220,3 @@ FROM financial_loan_data
 GROUP BY home_ownership
 ORDER BY COUNT(id) DESC
  
-Purpose: Home Ownership indicates the borrower's housing status. It offers insights into financial stability. Use for Banks: Banks use this field to assess collateral availability and borrower stability. Homeowners may have lower default rates.
-
