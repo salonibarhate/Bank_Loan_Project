@@ -206,9 +206,7 @@ FROM financial_loan_data
 GROUP BY purpose
 ORDER BY COUNT(id) DESC
  
-
-
-Home Ownership
+-- Home Ownership
 
 SELECT 
 	home_ownership,
